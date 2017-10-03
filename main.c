@@ -42,6 +42,10 @@
 /* FreeRTOS kernel includes. */
 #include "FRAMEWORK/FLEXCAN/flexcan_module.h"
 #include "FRAMEWORK/APP/can_node.h"
+#include "FRAMEWORK/ACCELEROMETER/accel_api.h"
+#include "FRAMEWORK/LED_IO/leds_app.h"
+#include "FRAMEWORK/APP/SERVER/uds_server.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -49,6 +53,8 @@
 
 /* Task priorities. */
 #define hello_task_PRIORITY (configMAX_PRIORITIES - 1)
+
+extern bool restart_me;
 
 extern volatile bool txComplete;
 extern volatile bool rxComplete;
@@ -68,8 +74,6 @@ void flexcan_task(void *pvParameters) {
 	const TickType_t xFrequency = 100;
 	xLastWakeTime = xTaskGetTickCount();
 
-	uint8_t mb;
-
 	for (;;) {
 
 		if(rxComplete == true){
@@ -78,7 +82,11 @@ void flexcan_task(void *pvParameters) {
 
 		}
 
+		cheat_seed();
 
+		if(1){
+			NVIC_SystemReset();
+		}
 		vTaskDelayUntil( &xLastWakeTime, xFrequency);
 
 	}
@@ -92,6 +100,12 @@ int main(void) {
 	BOARD_InitPins();
 	BOARD_BootClockRUN();
 	BOARD_InitDebugConsole();
+	BOARD_I2C_ReleaseBus();
+	BOARD_I2C_ConfigurePins();
+
+	leds_app_init();
+	accel_init();
+
 
 	/* Create RTOS task */
 	xTaskCreate(flexcan_task, "Flexcan_task", configMINIMAL_STACK_SIZE, NULL, hello_task_PRIORITY, NULL);

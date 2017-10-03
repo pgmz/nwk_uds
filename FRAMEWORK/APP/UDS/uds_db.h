@@ -14,6 +14,8 @@
 #define GET_DATA(xdata)				(xdata&0x00FF)
 #define JOIN_DID(DID1, DID2)		((DID1 << 8)|(DID2))
 
+#define SUCESSFUL					0x91
+
 typedef enum{
 	DiagnosticSessionControl = 0x10,
 	ECUReset = 0x11,
@@ -60,6 +62,14 @@ typedef enum{
 	serviceNotSupportedInActiveSession = 0x7F
 }nrc_db_t;
 
+typedef struct{
+	uint8_t answer_length;
+	uint8_t SID_status;
+	uint8_t SUB_or_DID1;
+	uint8_t DID2;
+	uint8_t DATA1;
+	uint8_t DATA2;
+}uds_db_answer_t;
 
 /**
  * @brief Check if RX data is correct
@@ -70,6 +80,8 @@ typedef enum{
  * @return @c NULL is always returned.
  */
 uint8_t can_control_check_rx(uint8_t SID, uint8_t SUB, uint8_t Length);
+uint8_t can_control_set_error_answer(uint8_t status, uint8_t SID);
+
 uint8_t f_DSC(uint8_t SUB, uint8_t Length);
 uint8_t f_ECUR(uint8_t SUB, uint8_t Length);
 uint8_t f_RDID(uint8_t SUB, uint8_t Length);

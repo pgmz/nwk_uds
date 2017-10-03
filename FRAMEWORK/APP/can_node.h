@@ -11,6 +11,8 @@
 #include "FRAMEWORK/FLEXCAN/flexcan_module.h"
 #include "app_messages.h"
 
+#define PADD_VAL		0x55
+
 /**
  * @brief State machine of the logic of NWK
  *

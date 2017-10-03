@@ -8,26 +8,26 @@
 #include "can_node.h"
 #include "UDS/uds_db.h"
 
+
+extern uds_db_answer_t uds_db_answer;
+
 /*Tx frame*/
 FlexCAN_frame_t FlexCAN_frame_Tx;
 
 /*Rx frame*/
 FlexCAN_frame_t FlexCAN_frame_Rx;
 
-uint8_t NRC_msg = 0x00;
-
 /*State machine*/
 void can_answer(){
 
+	memset(&FlexCAN_frame_Tx, PADD_VAL, sizeof(FlexCAN_frame_Tx));
 
-}
-
-
-void can_transmit(){
-
-	/*Transmit what is the NWK table for this node*/
-	FlexCAN_frame_Tx.txFram_8bits[0];
-	FlexCAN_frame_Tx.txFram_8bits[1];
+	FlexCAN_frame_Tx.txFram_8bits[0] = uds_db_answer.answer_length;
+	FlexCAN_frame_Tx.txFram_8bits[1] = uds_db_answer.SID_status;
+	FlexCAN_frame_Tx.txFram_8bits[2] = uds_db_answer.SUB_or_DID1;
+	FlexCAN_frame_Tx.txFram_8bits[3] = uds_db_answer.DID2;
+	FlexCAN_frame_Tx.txFram_8bits[4] = uds_db_answer.DATA1;
+	FlexCAN_frame_Tx.txFram_8bits[5] = uds_db_answer.DATA2;
 
 	flexcan_module_send(CAN_SERVER_ID, FlexCAN_frame_Tx);
 
@@ -43,8 +43,8 @@ void can_receive(){
 			FlexCAN_frame_Rx.txFram_8bits[3]);
 
 	/*If so, store the result*/
-	if(status == true){
-
+	if(status != SUCESSFUL){
+		can_control_set_error_answer(status, FlexCAN_frame_Rx.txFram_8bits[2]);
 	}
 }
 
