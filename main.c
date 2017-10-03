@@ -76,15 +76,21 @@ void flexcan_task(void *pvParameters) {
 
 	for (;;) {
 
+		//Check reception
 		if(rxComplete == true){
 
+			//Check rx message
 			can_receive();
+
+			//Tx message
 			can_answer();
 			rxComplete = false;
 		}
 
+		//change seed value ;)
 		cheat_seed();
 
+		//If need to restart, do it after answering and so...
 		if(restart_me){
 			NVIC_SystemReset();
 		}
@@ -104,6 +110,7 @@ int main(void) {
 	BOARD_I2C_ReleaseBus();
 	BOARD_I2C_ConfigurePins();
 
+	/** Initialize leds and accelerometer modules **/
 	leds_app_init();
 	accel_init();
 
