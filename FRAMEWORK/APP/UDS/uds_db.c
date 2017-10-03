@@ -90,7 +90,7 @@ uint8_t f_SA(uint8_t SUB, uint8_t Length){
 	uint16_t key;
 	can_node_get_xdata(&xdata);
 
-	key = JOIN_DID(SUB, GET_EXTRA_DID(xdata));
+	key = (xdata);
 
 
 	switch(SUB){

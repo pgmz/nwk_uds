@@ -35,4 +35,6 @@ void leds_only_blue();
 
 void leds_only_one(uint8_t led);
 
+void leds_all_off();
+
 #endif /* SOURCE_FRAMEWORK_LEDS_LEDS_APP_H_ */

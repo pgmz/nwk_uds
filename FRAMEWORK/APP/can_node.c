@@ -17,10 +17,10 @@ FlexCAN_frame_t FlexCAN_frame_Tx;
 /*Rx frame*/
 FlexCAN_frame_t FlexCAN_frame_Rx;
 
+uint8_t status;
+
 /*State machine*/
 void can_answer(){
-
-	memset(&FlexCAN_frame_Tx, PADD_VAL, sizeof(FlexCAN_frame_Tx));
 
 	FlexCAN_frame_Tx.txFram_8bits[0] = uds_db_answer.answer_length;
 	FlexCAN_frame_Tx.txFram_8bits[1] = uds_db_answer.SID_status;
@@ -28,6 +28,14 @@ void can_answer(){
 	FlexCAN_frame_Tx.txFram_8bits[3] = uds_db_answer.DID2;
 	FlexCAN_frame_Tx.txFram_8bits[4] = uds_db_answer.DATA1;
 	FlexCAN_frame_Tx.txFram_8bits[5] = uds_db_answer.DATA2;
+
+
+	for(int i = uds_db_answer.answer_length; i <8 ; i++){
+		FlexCAN_frame_Tx.txFram_8bits[i+1] = PADD_VAL;
+	}
+
+//	memset(&(FlexCAN_frame_Tx.txFram_8bits[0]) + uds_db_answer.answer_length + 1,
+//			PADD_VAL, 6 - uds_db_answer.answer_length);
 
 	flexcan_module_send(CAN_SERVER_ID, FlexCAN_frame_Tx);
 
@@ -38,7 +46,7 @@ void can_receive(){
 	/*Receive from a Mail Box*/
 	flexcan_module_receive(&FlexCAN_frame_Rx);
 
-	uint8_t status = can_control_check_rx(FlexCAN_frame_Rx.txFram_8bits[2],
+	status = can_control_check_rx(FlexCAN_frame_Rx.txFram_8bits[2],
 			FlexCAN_frame_Rx.txFram_8bits[1],
 			FlexCAN_frame_Rx.txFram_8bits[3]);
 

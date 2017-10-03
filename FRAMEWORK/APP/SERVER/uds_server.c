@@ -52,11 +52,12 @@ uint8_t f_ECUR_HR(){
 }
 uint8_t f_WDID_LC(uint8_t data){
 
-	if(server_status_struct.server_session != extended_session){
+	if((server_status_struct.server_session != extended_session) && (server_status_struct.server_session != service_session)){
 
 		return serviceNotSupportedInActiveSession;
 
 	}
+
 
 	server_status_struct.server_led_color = data;
 
@@ -80,7 +81,7 @@ uint8_t f_RDID_ACCEL(RDID_sub_db_t RDID_sub_db){
 
 
 	uds_db_answer.SID_status = ReadDataByIdentifier + 0x40;
-	uds_db_answer.SUB_or_DID1 = sub_x_axis&(0xFF00) >> 8;
+	uds_db_answer.SUB_or_DID1 = (sub_x_axis&(0xFF00)) >> 8;
 	uds_db_answer.answer_length = 5;
 
 	switch(RDID_sub_db){
@@ -118,7 +119,7 @@ uint8_t f_RDID_ACCEL(RDID_sub_db_t RDID_sub_db){
 }
 uint8_t f_RDID_LED(){
 
-	uds_db_answer.SUB_or_DID1 = sub_R_led_color&(0xFF00) >> 8;
+	uds_db_answer.SUB_or_DID1 = (sub_R_led_color&(0xFF00)) >> 8;
 	uds_db_answer.DID2 = sub_R_led_color&(0x00FF);
 	uds_db_answer.answer_length = 4;
 	uds_db_answer.DATA1 = server_status_struct.server_led_color;
@@ -128,8 +129,7 @@ uint8_t f_RDID_LED(){
 }
 uint8_t f_IOCID_SET(uint8_t data){
 
-	if((server_status_struct.server_session != extended_session) ||
-			(server_status_struct.server_session != service_session)){
+	if((server_status_struct.server_session != service_session)){
 
 		return serviceNotSupportedInActiveSession;
 
@@ -145,6 +145,12 @@ uint8_t f_IOCID_SET(uint8_t data){
 	if(server_status_struct.server_led_status == led_on){
 
 		leds_only_one(server_status_struct.server_led_color);
+
+	}
+
+	if(server_status_struct.server_led_status == lef_off){
+
+		leds_all_off();
 
 	}
 
@@ -167,17 +173,29 @@ uint8_t f_SA_REQ_SEED(){
 
 	server_status_struct.server_key = SERVER_ACCESS_KEY(server_status_struct.server_seed);
 
-	uds_db_answer.answer_length = 4;
+	uds_db_answer.answer_length = 5;
 
 	return SUCESSFUL;
 }
 
 uint8_t f_SA_VERI_KEY(uint16_t key){
-	uds_db_answer.SID_status = SecurityAccess + 0x40;
-	uds_db_answer.SUB_or_DID1 = sub_level_2;
-	uds_db_answer.answer_length = 2;
 
-	return SUCESSFUL;
+	if(key == (server_status_struct.server_key)&(0x00FF)){
+
+		server_status_struct.server_session = service_session;
+		uds_db_answer.SID_status = SecurityAccess + 0x40;
+		uds_db_answer.SUB_or_DID1 = sub_level_2;
+		uds_db_answer.answer_length = 2;
+
+		return SUCESSFUL;
+
+	} else {
+
+		return 0x7F;
+
+	}
+
+
 }
 
 uint8_t f_ERROR(uint8_t status, uint8_t SID){

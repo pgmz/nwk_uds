@@ -59,7 +59,7 @@ typedef enum{
 	serviceNotSupported = 0x11,
 	subFunctionNotSupported = 0x12,
 	incorrectMessageLengthOrInvalidFormat = 0x13,
-	serviceNotSupportedInActiveSession = 0x7F
+	serviceNotSupportedInActiveSession = 0x7E
 }nrc_db_t;
 
 typedef struct{

@@ -79,12 +79,13 @@ void flexcan_task(void *pvParameters) {
 		if(rxComplete == true){
 
 			can_receive();
-
+			can_answer();
+			rxComplete = false;
 		}
 
 		cheat_seed();
 
-		if(1){
+		if(restart_me){
 			NVIC_SystemReset();
 		}
 		vTaskDelayUntil( &xLastWakeTime, xFrequency);

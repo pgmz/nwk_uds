@@ -76,7 +76,14 @@ void leds_only_one(uint8_t led){
 	case ONLY_RED_LED:				leds_only_red();		break;
 	case ONLY_GREEN_LED:			leds_only_green();		break;
 	case ONLY_BLUE_LED:				leds_only_blue();		break;
+	case 0x04:						leds_all_off();			break;
 	default:break;
 	}
 
+}
+
+void leds_all_off(){
+	leds_green_led(false);
+	leds_blue_led(false);
+	leds_red_led(false);
 }
